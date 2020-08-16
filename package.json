@@ -1,0 +1,11 @@
+{
+  "name": "ek400",
+  "version": "1.0.0",
+  "description": "Discord bot.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Genoveva Fossas",
+  "license": "MIT"
+}
