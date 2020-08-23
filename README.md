@@ -41,3 +41,12 @@ To begin using this bot, make sure to create a file called `config.json` under `
 Once this file is created, you can run the bot with `npm run start`. Make sure to run `npm install` before you do so to install dependencies. I have also included a cleaning script, run with `npm run clean`, to delete `node_modules/` for you.
 
 There is also eslint configured to guide code style.
+
+## Areas for Improvement, Future Features
+
+#### Areas for Improvement:
+
+1) As of right now, the way members of a `daysSince` board is handled is a little inefficient. I'm using the built in `push()` function of `enmap` to add users to the array of members, but each time I want to verify if someone is in the array or not (to avoid duplicates) I have to use the JavaScript built-in `Array.prototype.find()`, which will be inefficient for long member lists. This is acceptable performance inefficiency for smaller servers, but can cause an issue for bigger ones. To remove users, it also uses `Array.prototype.filter()`, which has similar considerations.
+    * One of my proposed solutions was using a vanilla Map from JavaScript for the users. Members would be stored with their id as the key, and the date as the value. However, there is an issue with this: the sqlite database cannot preserve maps as Map objects. This means that I would have to take the stringified list and make it a map again each time I want to modify data, which would include in the `update`, `leave`, and `join` functions (at the very least). This may not see a significant performance improvement over the current implementation, but I am currently looking into verifying if it will or not.
+2) Minimize the amount of times that a Date object must be constructed. Since the sqlite database cannot maintain objects, it may be worthwhile to see if there is a more efficient (and supported) way to verify a date is valid. Using Date.parse() is generally discouraged. From the [MDN web docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse):
+> It is not recommended to use `Date.parse` as until ES5, parsing of strings was entirely implementation dependent. There are still many differences in how different hosts parse date strings, therefore date strings should be manually parsed (a library can help if many different formats are to be accommodated).
