@@ -1,1 +1,43 @@
-# EK400 Discord Bot
+# EK400
+> JavaScript discord bot using `enmap` and `Discord.js`.
+
+## Introduction
+
+About one year ago (May 2019), I created a discord bot to better understand JavaScript. It was a great first project, but there was a lot I wanted to improve on after taking on two internships with projects written in JavaScript. This is the culmination of that desire. This project, much like its predecessor [GlitchBot](https://github.com/genovevafossas/GlitchBot), uses the command/event loading structure that is found in [An Idiot's Guide](https://anidiots.guide/first-bot/your-first-bot). This structure uses the npm package [enmap](https://enmap.evie.dev/), which allows for persistent storage of data locally. Enmap is most useful for the `daysSince` command, but is also useful for associating functions with certain command names on the bot object itself.
+
+## Dependencies
+
+* `better-sqlite3`
+    * Associated with `enmap` - used for map persistence.
+* `discord.js`
+* `enmap`
+    * Chosen over vanilla JavaScript maps due to the added persistence functionality
+* `eslint`
+
+## Functionality
+The bot currently has 3 commands:
+* `daysSince`
+    * Creates and manages an object that represents a board tracking how many days since something has happened. Dates are tracked by members on the object representing the board. Options for this command are as follows:
+        * `new <title>` - Create a new board with the title given by the user. By default, there are no users on the board upn creation.
+        * `join <date> <title>` - Join the `<title>` board with `<date>`. The date should be in the format specified by JavaScript's `Date` object. (`yyyy-mm-dd`)
+        * `update <date> <title>` - Update your listing on `<title>` with `<date>`.
+        * `leave <title>` - Leave the board called `<title>`.
+        * `delete <title>` - Delete the board called `<title>`. This can only be done by the creator of the board.
+        * `view <title>` - Displays the board in an enmap. The number of days elapsed is calculated upon each view.
+* `help` - Displays information about each command and their usage. Includes some sub-help pages.
+* `info`- Displays information about the bot.
+
+## Usage Guide
+To begin using this bot, make sure to create a file called `config.json` under `/src/`. There is an example file called `example-config.json` which you can rename to just `config.json`. This file includes the prefix for the bot (what you type before a command), the owner's id (used for some admin options built in to the daysSince command), and the token for your bot (from the Discord developer portal). It should roughly look like this:
+
+```json
+    {
+        "ownerId": "your-owner-id",
+        "prefix": "!",
+        "token": "your-token"
+    }
+```
+
+Once this file is created, you can run the bot with `npm run start`. Make sure to run `npm install` before you do so to install dependencies. I have also included a cleaning script, run with `npm run clean`, to delete `node_modules/` for you.
+
+There is also eslint configured to guide code style.

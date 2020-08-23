@@ -4,7 +4,7 @@ const infoEmbed = {
     fields: [
         {
             name: "GitHub Repository",
-            value: "[url placeholder]",
+            value: "https://github.com/genovevafossas/EK400",
             inline: true
         },
         {
