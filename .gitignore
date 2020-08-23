@@ -4,6 +4,9 @@ src/config.json
 # Sqlite data
 data/
 
+#Vscode workspace settings
+.vscode/
+
 # Logs
 logs
 *.log
