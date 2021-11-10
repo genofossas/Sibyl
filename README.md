@@ -1,4 +1,4 @@
-# EK400
+# Sibyl
 > JavaScript discord bot using `enmap` and `Discord.js`.
 
 ## Introduction
