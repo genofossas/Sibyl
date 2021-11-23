@@ -1,5 +1,5 @@
 {
-  "name": "ek400",
+  "name": "sibyl-bot",
   "version": "2.0.0",
   "description": "Discord bot.",
   "main": "/src/index.js",
