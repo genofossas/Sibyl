@@ -4,12 +4,12 @@ const infoEmbed = {
     fields: [
         {
             name: "GitHub Repository",
-            value: "https://github.com/genovevafossas/EK400",
+            value: "https://github.com/genovevafossas/Sibyl",
             inline: true
         },
         {
             name: "Author",
-            value: "@Rainier#1600",
+            value: "@Geno#1600",
             inline: true
         }
     ]

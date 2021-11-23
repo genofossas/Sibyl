@@ -11,6 +11,10 @@ const generalHelpEmbed = {
             value: "Displays supported commands and usage."
         },
         {
+            name: "!clown",
+            value: "Creates and manages clownery leaderboards. Type `!help clown` for specific command usage."
+        },
+        {
             name: "!info",
             value: "Displays information about the bot."
         }
@@ -49,13 +53,29 @@ const daysSinceHelpEmbed = {
     ]
 };
 
+const clownHelpEmbed = {
+    color: 0x799464,
+    title: 'clown Command',
+    description: 'Keeps track of the clownery of your fellow server mates.',
+    fields: [
+        {
+            name: '!clown poll',
+            value: 'Creates a clown poll.'
+        }
+    ]
+}
+
 exports.run = (bot, message, args) => {
+    const channel =  bot.channels.cache.get(message.channelId)
     switch (args.shift()) {
         case "daysSince":
-            message.channel.send(message.author, {embed: daysSinceHelpEmbed});
+            channel.send({content: `${message.author},`, embeds: [daysSinceHelpEmbed]});
+            break;
+        case "clown":
+            channel.send({content: `${message.author},`, embeds: [clownHelpEmbed]})
             break;
         default:
-            message.channel.send(message.author, {embed: generalHelpEmbed});
+            channel.send({content: `${message.author},`, embeds: [generalHelpEmbed]})
             break;       
     }
 };

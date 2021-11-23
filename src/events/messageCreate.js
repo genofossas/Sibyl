@@ -5,7 +5,7 @@ module.exports = (bot, message) => {
     }
 
     if (message.content.charAt(0) == bot.config.prefix) {
-        const args = message.content.slice(bot.config.prefix.length).trim().split(/ +/g);
+        const args = message.content.slice(bot.config.prefix.length).trim().split(/\s+/g);
         const commandName = args.shift().toLowerCase();
 
         // Grab the command from the enmap

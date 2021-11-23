@@ -2,33 +2,34 @@ const Enmap = require("enmap");
 
 exports.run = (bot, message, args) => {
     bot.daysSince = new Enmap({name: "daysSince"});
+    const channel = bot.channels.cache.get(message.channelId)
     switch(args.shift()) {
         case "new":
-            createBoard(bot, message, args);
+            createBoard(bot, message, channel, args);
             break;
         case "update":
-            updateBoard(bot, message, args);
+            updateBoard(bot, message, channel, args);
             break;
         case "view":
-            viewBoard(bot, message, args);
+            viewBoard(bot, message, channel, args);
             break;
         case "join":
-            joinBoard(bot, message, args);
+            joinBoard(bot, message, channel, args);
             break;
         case "delete":
-            deleteBoard(bot, message, args);
+            deleteBoard(bot, message, channel, args);
             break;
         case "leave":
-            leaveBoard(bot, message, args);
+            leaveBoard(bot, message, channel, args);
             break;
         case "adminDelete":
-            deleteAll(bot, message);
+            deleteAll(bot, message, channel);
             break;
         case "adminView":
-            viewAll(bot, message);
+            viewAll(bot, message, channel);
             break;
         default:
-            message.channel.send(`${message.author}, that is not a recognized term. Type \`!help\` for parameter info.`);
+            channel.send(`${message.author}, that is not a recognized term. Type \`!help daysSince\` for parameter info.`);
             break;
     }
 };
@@ -41,14 +42,14 @@ function getKey (message, title) {
     }
 }
 
-function createBoard (bot, message, args) {
+function createBoard (bot, message, channel, args) {
     const enmap = bot.daysSince;
     const title = args.join(" ");
     const key = getKey(message, title);
-    const guild = (message.channel.type === "text") ? message.guild.id : null;
+    const guild = (channel.type === "text") ? message.guild.id : null;
 
     if (enmap.has(key) && (enmap.get(key, "creator") !== message.author.id)) {
-        return message.channel.send(`${message.author}, you cannot overwrite a board you did not create.`);
+        return channel.send(`${message.author}, you cannot overwrite a board you did not create.`);
     }
 
     enmap.set(key, {
@@ -59,101 +60,103 @@ function createBoard (bot, message, args) {
         title: title
     });
 
-    return message.channel.send(`${message.author}, successfully created \`${title}\``);
+    return channel.send(`${message.author}, successfully created \`${title}\``);
 }
 
-function joinBoard (bot, message, args) {
+function joinBoard (bot, message, channel, args) {
     const enmap = bot.daysSince;
+    console.log(args)
     const date = new Date(args.shift());
 
+
     if (isNaN(date)) {
-        return message.channel.send(`${message.author}, that is an invalid date. The format is \`yyyy-mm-dd\``);
+        return channel.send(`${message.author}, that is an invalid date. The format is \`yyyy-mm-dd\``);
     }
 
     const title = args.join(" ");
     const key = getKey(message, title);
     if (!enmap.has(key)) {
-        return message.channel.send(`${message.author}, there are no boards called \`${title}\``);
+        return channel.send(`${message.author}, there are no boards called \`${title}\``);
     }
 
     const members = enmap.get(key, "members");
     if (members.find(member => member.user.id === message.author.id) !== undefined) {
-        return message.channel.send(`${message.author}, you are already a member of \`${title}\`. Please use the update functionality instead.`);
+        return channel.send(`${message.author}, you are already a member of \`${title}\`. Please use the update functionality instead.`);
     }
 
     enmap.push(key, {user: message.author, date: date}, "members");
-    return message.channel.send (`${message.author}, you were successfully added to \`${title}\``);
+    return channel.send (`${message.author}, you were successfully added to \`${title}\``);
 }
 
-function leaveBoard (bot, message, args) {
+function leaveBoard (bot, message, channel, args) {
     const enmap = bot.daysSince;
     const title = args.join(" ");
     const key = getKey(message, title);
 
     if (!enmap.has(key)) {
-        return message.channel.send(`${message.author}, there are no boards called \`${title}\``);
+        return channel.send(`${message.author}, there are no boards called \`${title}\``);
     }
 
     const allMembers = enmap.get(key, "members");
     const memberIndex = allMembers.findIndex(member => member.user.id === message.author.id);
     if(memberIndex === -1)  {
-        return message.channel.send(`${message.author}, you're not a member of \`${title}\`.`);
+        return channel.send(`${message.author}, you're not a member of \`${title}\`.`);
     }
 
     allMembers.splice(memberIndex, 1);
     enmap.set(key, allMembers, "members");
-    return message.channel.send(`${message.author}, you were successfully removed from \`${title}\`.`);
+    return channel.send(`${message.author}, you were successfully removed from \`${title}\`.`);
 }
 
-function updateBoard (bot, message, args) {
+function updateBoard (bot, message, channel, args) {
     const enmap = bot.daysSince;
     const date = new Date(args.shift());
 
     if (isNaN(date)) {
-        return message.channel.send(`${message.author}, that is an invalid date. The format is \`yyyy-mm-dd\`.`);
+        return channel.send(`${message.author}, that is an invalid date. The format is \`yyyy-mm-dd\`.`);
     }
 
     const title = args.join(" ");
     const key = getKey(message, title);
     if (!enmap.has(key)) {
-        return message.channel.send(`${message.author}, there are no boards called \`${title}\``);
+        return channel.send(`${message.author}, there are no boards called \`${title}\``);
     }
 
     const allMembers = enmap.get(key, "members");
     const memberIndex = allMembers.findIndex(member => member.user.id === message.author.id);
     if(memberIndex === -1)  {
-        return message.channel.send(`${message.author}, you're not a member of \`${title}\`.`);
+        return channel.send(`${message.author}, you're not a member of \`${title}\`.`);
     }
 
     allMembers.splice(memberIndex, 1, {user: message.author, date: date});
     enmap.set(key, allMembers, "members");
-    return message.channel.send(`${message.author}, you were successfully added to ${title}`);
+    return channel.send(`${message.author}, you were successfully added to ${title}`);
 }
 
-function deleteBoard (bot, message, args) {
+function deleteBoard (bot, message, channel, args) {
     const enmap = bot.daysSince;
     const title = args.join(" ");
     const key = getKey(message, title);
 
     if (!enmap.has(key)) {
-        return message.channel.send(`${message.author}, there are no boards called \`${title}\``);
+        return channel.send(`${message.author}, there are no boards called \`${title}\``);
     }
 
     if (enmap.get(key, "creator") !== message.author.id) {
-        return message.channel.send(`${message.author}, you cannot delete a board that you did not create.`);
+        return channel.send(`${message.author}, you cannot delete a board that you did not create.`);
     }
 
     enmap.delete(key);
-    return message.channel.send(`${message.author}, ${title} was successfully deleted.`);
+    return channel.send(`${message.author}, ${title} was successfully deleted.`);
 }
 
-function viewBoard (bot, message, args) {
+function viewBoard (bot, message, channel, args) {
     const enmap = bot.daysSince;
     const title = args.join(" ");
     let key = getKey(message, title);
 
     if (!enmap.has(key)) {
-        return message.channel.send(`${message.author}, there are no boards called \`${title}\``);
+        return channel.send(`${message.author}, there are no boards called \`${title}\``);
     }
 
     const board = enmap.get(key);
@@ -166,11 +169,11 @@ function viewBoard (bot, message, args) {
         };
     });
     
-    return message.channel.send(message.author, {embed: {
+    return channel.send({content: `${message.author},`, embeds: [{
         color: 0x799464,
         title: board.title,
         fields: embedFields
-    }});
+    }]});
 }
 
 /*
@@ -179,20 +182,20 @@ function viewBoard (bot, message, args) {
   I'm not the boss of you. :)
 */
 
-function deleteAll(bot, message) {
+function deleteAll(bot, message, channel) {
     const enmap = bot.daysSince;
     if (message.author.id !== bot.config.ownerId) {
-        return message.channel.send(`${message.author}, you are not permitted to carry out this action.`);
+        return channel.send(`${message.author}, you are not permitted to carry out this action.`);
     }
     enmap.clear();
-    return message.channel.send("Successfully cleared all boards.");
+    return channel.send("Successfully cleared all boards.");
 }
 
 
-function viewAll (bot, message) {
+function viewAll (bot, message, channel) {
     if (message.author.id !== bot.config.ownerId) {
-        return message.channel.send(`${message.author}, you are not permitted to carry out this action.`);
+        return channel.send(`${message.author}, you are not permitted to carry out this action.`);
     }
     const allIndexes = bot.daysSince.indexes.join("\n");
-    return message.channel.send(`All indexes in the daysSince enmap are as follows:\n\`\`\`\n${allIndexes}\`\`\``);
+    return channel.send(`All indexes in the daysSince enmap are as follows:\n\`\`\`\n${allIndexes}\`\`\``);
 }

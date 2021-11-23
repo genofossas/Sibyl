@@ -1,10 +1,10 @@
-const Discord = require("discord.js");
+const {Client, Intents} = require("discord.js");
 const config = require("./config.json");
 const fs = require("fs");
 const Enmap = require("enmap");
 
 // Initializing bot info
-const bot = new Discord.Client();
+const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 bot.config = config;
 
 // Loading events
