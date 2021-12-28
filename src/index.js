@@ -4,7 +4,7 @@ const fs = require("fs");
 const Enmap = require("enmap");
 
 // Initializing bot info
-const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
 bot.config = config;
 
 // Loading events
