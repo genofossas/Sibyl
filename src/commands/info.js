@@ -9,12 +9,13 @@ const infoEmbed = {
         },
         {
             name: "Author",
-            value: "@Geno#1600",
+            value: "Geno#1600",
             inline: true
         }
     ]
 };
 
 exports.run = exports.run = (bot, message, args) => {
-    message.channel.send(message.author, {embed: infoEmbed});
+    const channel = bot.channels.cache.get(message.channelId);
+    channel.send({content: `${message.author}`, embeds: [infoEmbed]});
 }
