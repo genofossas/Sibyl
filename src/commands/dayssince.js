@@ -1,5 +1,3 @@
-const Enmap = require("enmap");
-
 exports.run = (bot, message, args) => {
     const channel = bot.channels.cache.get(message.channelId)
     switch(args.shift()) {
