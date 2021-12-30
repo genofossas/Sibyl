@@ -87,7 +87,7 @@ function endClownSeason (bot, message, channel, args) {
         return channel.send(`${message.author}, this server does not have an ongoing clown season.`);
     }
 
-    seasonOwner = enamp.get(key, "creator");
+    seasonOwner = enmap.get(key, "creator");
 
     if (seasonOwner != message.author.id) {
         return channel.send(`${message.author}, you are not authorized to end this clown season.`);
