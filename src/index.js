@@ -24,6 +24,10 @@ bot.login(bot.config.token);
 // Creating an Enmap for commands
 bot.commands = new Enmap();
 
+// Other enmaps for commands
+bot.daysSince = new Enmap({name: "daysSince"});
+bot.clownBoard = new Enmap({name: "clownBoard"});
+
 // Loading commands
 fs.readdir("./src/commands/", (err, files) => {
     if (err) {

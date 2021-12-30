@@ -2,7 +2,6 @@ const Enmap = require("enmap");
 const { ReactionCollector } = require("discord.js")
 
 exports.run = (bot, message, args) => {
-    bot.clownBoard = new Enmap("clownBoard");
     const channel = bot.channels.cache.get(message.channelId);
 
     if (channel.type !== 'GUILD_TEXT') {

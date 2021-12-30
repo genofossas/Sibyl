@@ -1,7 +1,6 @@
 const Enmap = require("enmap");
 
 exports.run = (bot, message, args) => {
-    bot.daysSince = new Enmap({name: "daysSince"});
     const channel = bot.channels.cache.get(message.channelId)
     switch(args.shift()) {
         case "new":
