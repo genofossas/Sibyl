@@ -1,4 +1,3 @@
-const Enmap = require("enmap");
 const { ReactionCollector } = require("discord.js")
 
 exports.run = (bot, message, args) => {
@@ -116,7 +115,8 @@ async function createPoll (bot, message, channel, args) {
     const embed = {
         color: 0x000000,
         title: ":clown: Clown Poll :clown:",
-        description: "React with :clown: if you think that this is a clown action or :x: if you don't.",
+        description: "React with :clown: if you think that this is a clown action or :x: if you don't. \n\
+        *Additionally, the creator of the poll can react with :put_litter_in_its_place: to delete it.*",
         fields: [
             {
                 name: "Clown offense",
@@ -138,28 +138,41 @@ async function createPoll (bot, message, channel, args) {
         embeds:[embed]
     });
 
+    await msg.react('🤡')
+    await msg.react('❌')
+
     enmap.push(guild, userId, "polls")
-    reactCollectorHelper(msg, channel, numVotes, enmap, guild, userId, user)
+    reactCollectorHelper(msg, channel, numVotes, enmap, guild, userId, user, message.author.id)
 }
 
 
-function reactCollectorHelper (msg, channel, numVotes, enmap, key, clownId, clownMention) {
+async function reactCollectorHelper (msg, channel, numVotes, enmap, key, clownId, clownMention, pollCreator) {
     const votes = {}
+
+    // Instantiating poll message with the vote options.
 
     const filter = (reaction, user) => {
         const emoji = reaction.emoji.name;
 
-        // Make sure it's a valid emoji and that the user
-        // voting isn't the clown in question
-        const emojiBool = emoji === '🤡' || emoji === '❌' || emoji === '🚮';
-        const validUser = user.id !== clownId
+        // Determines if its a valid vote for clown/not clown
+        const isVote = emoji === '🤡' || emoji === '❌';
+        const isValidVote = user.id !== clownId
 
-        // Make proper filtering decision based on prior criteria
-        if (emojiBool && validUser) {
+        // Determines if bot is reacting to instantiate
+        const isBotVote = msg.author.id === user.id
+
+        // Determines if creator sent a delete react
+        const isCreator = pollCreator === user.id
+        const isDeleteReq = emoji === '🚮'
+
+        // Make proper filtering decision based on criteria.
+        if (isVote && isBotVote) {
+            return false;
+        } else if (isVote && isValidVote || isCreator && isDeleteReq ) {
             return true;
         } else {
             msg.reactions.resolve(reaction.emoji.name).users.remove(user.id)
-            return false
+            return false;
         }
     }
 
@@ -183,7 +196,6 @@ function reactCollectorHelper (msg, channel, numVotes, enmap, key, clownId, clow
     collector.on('end', (collected, reason) => {
         // Handling deleted polls.
         if (collected.has('🚮')) {
-            console.log(collected)
             enmap.remove(key, clownId, "polls")
             return channel.send(`The poll for ${clownMention} was deleted.`);
         }
@@ -199,11 +211,18 @@ function reactCollectorHelper (msg, channel, numVotes, enmap, key, clownId, clow
             }
         }
 
+        // Doing nothing in the case of not enough votes
+        // (triggers when message is manually deleted)
+        if ((clown + notClown) != numVotes) {
+            enmap.remove(key, clownId, "polls");
+            return channel.send(`There was not enough votes to come to a verdict on ${clownMention}'s clownery.`);
+        }
+
         // Decide and give verdict
         if (clown > notClown) {
             updateScores(clownId, enmap, key, channel, clownMention)
         } else {
-            channel.send(`There has been a verdict! ${clownMention} was found not guilty of clownery.`)
+            channel.send(`There has been a verdict! ${clownMention} was found not guilty of clownery.`);
         }
         enmap.remove(key, clownId, "polls")
     });
