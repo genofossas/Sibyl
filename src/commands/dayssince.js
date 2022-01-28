@@ -32,7 +32,7 @@ exports.run = (bot, message, args) => {
 };
 
 function getKey (message, title) {
-    if (message.channel.type === "text") {
+    if (message.channel.type === "GUILD_TEXT") {
         return `${message.guild.id}-${title}`;
     } else {
         return `${message.author.id}-${title}`;
@@ -43,7 +43,7 @@ function createBoard (bot, message, channel, args) {
     const enmap = bot.daysSince;
     const title = args.join(" ");
     const key = getKey(message, title);
-    const guild = (channel.type === "text") ? message.guild.id : null;
+    const guild = (channel.type === "GUILD_TEXT") ? message.guild.id : null;
 
     if (enmap.has(key) && (enmap.get(key, "creator") !== message.author.id)) {
         return channel.send(`${message.author}, you cannot overwrite a board you did not create.`);
