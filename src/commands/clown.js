@@ -1,4 +1,4 @@
-const { ReactionCollector } = require("discord.js")
+const { ReactionCollector, MessageEmbed } = require("discord.js")
 
 exports.run = (bot, message, args) => {
     const channel = bot.channels.cache.get(message.channelId);
@@ -32,7 +32,7 @@ exports.run = (bot, message, args) => {
     }
 }
 
-function viewLeaderboard (bot, message, channel, args) {
+async function viewLeaderboard (bot, message, channel, args) {
     const enmap = bot.clownBoard;
     const key =  message.guild.id;
 
@@ -41,12 +41,19 @@ function viewLeaderboard (bot, message, channel, args) {
     }
 
     const board = enmap.get(key);
-    const embedFields = board.scores.map(score => {
+    const embedFields = board.scores.map((score) => {
         return {
-            name: bot.users.cache.get(score.id).username,
+            name: score.id,
             value: score.val.toString()
         };
     });
+
+    console.log(embedFields)
+
+    for (var i = 0, l=embedFields.length; i<l; i++) {
+        const user = await bot.users.fetch(embedFields[i].name)
+        embedFields[i].name = user.username
+    }
     
     const embed = {
         color: 0x000000,
